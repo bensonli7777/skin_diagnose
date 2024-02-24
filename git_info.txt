@@ -1,3 +1,0 @@
-git config --global user.name "bensonli7777"
-git config --global user.email "bensonli7777@gmail.com"
-cd /Users/bensonli/Documents/cpp_class/project
