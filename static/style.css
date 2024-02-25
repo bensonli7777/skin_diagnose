@@ -1,12 +1,41 @@
-body {
+body, html {
+    height: 100%;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+}
+.screen {
+    display: none;
+    text-align: center;
     padding: 20px;
 }
-
-#photo-preview {
-    max-width: 90%;
-    height: auto;
+.screen.active {
+    display: block;
+}
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 16px;
     margin-top: 20px;
+    margin: 10px;
+}
+#captureButton, #cropButton, #restartButton {
+    background-color: #28a745;
+}
+#preview, .cropper-container {
+    flex-grow: 1;
+}
+#progressContainer {
+    width: 100%;
+    background-color: #ddd;
+}
+
+#progressBar {
+    height: 20px;
+    background-color: #4CAF50;
+    width: 0%;
+    transition: width 0.4s ease-in-out;
 }

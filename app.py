@@ -2,9 +2,10 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
+import time
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app) # 允许跨域请求
+CORS(app) # 允許跨域請求
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -22,13 +23,28 @@ def upload_image():
         return jsonify({'error': 'No selected file'}), 400
     if file:
         filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        return jsonify({'message': 'Image received', 'status': 'success', 'filepath': file_path})
+        filepath = os.path.join('uploads', filename)
+        file.save(filepath)
+        
+        # 模拟分析过程
+        result = simulate_analysis(filepath)
+        
+        return jsonify(result)
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+def simulate_analysis(image_path):
+    # 模拟分析过程需要一些时间
+    time.sleep(10)  # 模拟耗时操作
+    # 返回模拟结果
+    return {
+        'status': 'success',
+        'disease': 'Acne',
+        'confidence': 98.5
+    }
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
