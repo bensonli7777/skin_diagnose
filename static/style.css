@@ -3,33 +3,45 @@ body, html {
     margin: 0;
     display: flex;
     flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    justify-content: center;
+    align-items: center;
 }
+
 .screen {
     display: none;
     text-align: center;
-    padding: 20px;
+    width: 100%;
 }
+
 .screen.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
+
 button {
-    background-color: #007bff;
+    background-color: #4CAF50; /* Green */
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 15px 30px;
     border-radius: 20px;
-    font-size: 16px;
+    font-size: 18px;
     margin-top: 20px;
-    margin: 10px;
+    cursor: pointer;
 }
+
 #captureButton, #cropButton, #restartButton {
-    background-color: #28a745;
+    background-color: #4CAF50; /* Green */
 }
-#preview, .cropper-container {
-    flex-grow: 1;
-}
+
 #progressContainer {
-    width: 100%;
+    position: fixed;
+    bottom: 15%;
+    width: 80%;
+    left: 10%;
     background-color: #ddd;
 }
 
@@ -38,4 +50,76 @@ button {
     background-color: #4CAF50;
     width: 0%;
     transition: width 0.4s ease-in-out;
+}
+
+#analysisResult {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+#analysisResult p {
+    margin: 10px 0;
+    color: #333;
+}
+
+#analysisResult .result-conclusion {
+    background-color: #80c904;
+    color: #fff;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 20px;
+    font-weight: bold;
+    width: 100%; /* Full width */
+    text-align: center;
+}
+
+/* Responsive Image */
+#preview {
+    max-width: 100%;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+/* Add responsiveness to the video */
+#video {
+    width: 100%; /* Full width */
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+/* Hide the cropper container initially */
+#cropContainer {
+    display: none;
+    width: 100%;
+}
+
+/* This will style the div that holds the cropped image preview */
+#cropPreview {
+    width: 100%; /* Full width */
+    margin-bottom: 20px;
+}
+
+/* Adjust the restart button to match the design */
+#restartButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 20px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+#croppedImage {
+    width: 350px; /* Set the width of the cropped image */
+    height: 200px; /* Set the height of the cropped image */
+    object-fit: cover; /* Ensure the aspect ratio is maintained without stretching the image */
+    margin-bottom: 20px; /* Add some space between the image and the text result */
 }

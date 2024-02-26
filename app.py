@@ -38,7 +38,7 @@ def uploaded_file(filename):
 
 def simulate_analysis(image_path):
     # 模拟分析过程需要一些时间
-    time.sleep(10)  # 模拟耗时操作
+    time.sleep(2)  # 模拟耗时操作
     # 返回模拟结果
     return {
         'status': 'success',

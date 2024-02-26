@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Capture and Crop</title>
+    <title>皮膚狀況分析</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="welcomeScreen" class="screen active">
-        <h1>欢迎使用智能皮肤诊断</h1>
-        <p>简单三步，快速了解皮肤状况</p>
-        <button id="startButton">开始</button>
+        <h1>歡迎使用智能皮膚診斷</h1>
+        <p>簡單三步，快速了解情況</p>
+        <button id="startButton">開始</button>
     </div>
+    
     <div id="captureScreen" class="screen">
         <video id="video" style="display:none;"></video>
         <button id="captureButton">📷 拍照</button>
     </div>
+    
     <div id="cropScreen" class="screen">
         <img id="preview" style="display:none;">
         <div id="cropContainer" style="display:none;"></div>
-        <button id="cropButton" style="display:none;">裁切并上传</button>
+        <button id="cropButton" style="display:none;">裁切上傳</button>
     </div>
+    
     <div id="resultScreen" class="screen">
-        <div id="uploadResult"></div>
-        <button id="restartButton">重新开始</button>
+        <img id="croppedImage" style="max-width: 100%; height: auto; margin-bottom: 20px;" alt="Cropped result"/>
+        <div id="progressContainer" style="display:none;">
+            <div id="progressBar"></div>
+        </div>
+        <div id="analysisResult" style="display:none;"></div>
+        <button id="restartButton" style="display:none;">重新開始</button>
     </div>
-    <div id="progressContainer" style="display:none;">
-        <div id="progressBar"></div>
-    </div>
-    <div id="analysisResult" style="display:none;"></div>
-
-
+    
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
 </body>
