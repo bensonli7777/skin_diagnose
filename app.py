@@ -3,12 +3,18 @@ from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
 import time
+import cv2
+from tensorflow.keras.models import load_model
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app) # 允許跨域請求
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+model = load_model('project/best_model.h5')
+classes = {4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 
 @app.route('/')
 def home():
@@ -27,7 +33,7 @@ def upload_image():
         file.save(filepath)
         
         # 模拟分析过程
-        result = simulate_analysis(filepath)
+        result = analyze_image(filepath)
         
         return jsonify(result)
 
@@ -36,15 +42,23 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
-def simulate_analysis(image_path):
-    # 模拟分析过程需要一些时间
-    time.sleep(2)  # 模拟耗时操作
-    # 返回模拟结果
+def analyze_image(image_path):
+    img = cv2.imread(image_path)
+    img = cv2.resize(img, (28, 28))  # Resize the image to match the model's expected input
+    img = img.reshape(1, 28, 28, 3)  # Reshape for the model (assuming your model expects this shape)
+    img = img / 255.0  # Normalize the image if your model expects pixel values in [0, 1]
+
+    result = model.predict(img)
+    max_prob = max(result[0])
+    class_ind = list(result[0]).index(max_prob)
+    class_name = classes[class_ind]
+
     return {
         'status': 'success',
-        'disease': 'Acne',
-        'confidence': 98.5
+        'disease': class_name,
+        'confidence': round(max_prob * 100, 2)
     }
+
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)

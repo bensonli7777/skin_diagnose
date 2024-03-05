@@ -108,7 +108,7 @@ function cropAndUploadImage() {
 function showProgress() {
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
-    progressContainer.style.display = 'block';
+    progressContainer.style.display = 'none';//turn this into none to hide it. Turn on :block
     let progress = 0;
     const interval = setInterval(() => {
         progress += 10;
@@ -118,7 +118,7 @@ function showProgress() {
             progressContainer.style.display = 'none';
             progressBar.style.width = `0%`;
             
-        }
+        } 
     }, 300);
 }
 
