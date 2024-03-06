@@ -1,6 +1,6 @@
 Flask
 Flask-CORS
 Werkzeug==3.0.1
-opencv-python==4.9.0.80
+opencv-python-headless
 tensorflow-cpu
 google-cloud-storage
