@@ -32,7 +32,7 @@ def download_model_from_gcs():
         blob.download_to_filename(MODEL_PATH)
         print(f"Model {MODEL_BLOB_NAME} downloaded from bucket {MODEL_BUCKET} to {MODEL_PATH}.")
 
-
+download_model_from_gcs()
 model = load_model(MODEL_PATH)  # Now load_model uses the local path, which might have been just downloaded from GCS
 classes = {4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 
