@@ -15,25 +15,8 @@ UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-MODEL_PATH = 'project/best_model.h5'  # Model path in your local directory
-MODEL_BUCKET = 'cpp-project-415117.appspot.com'  # GCS bucket where the model is stored
-MODEL_BLOB_NAME = 'best_model.h5'  # Model file name in GCS bucket
 
-def download_model_from_gcs():
-    """Download the model from Google Cloud Storage if it's not present."""
-    service_account_path = 'project/cpp-project-415117-5422981ba4ba.json'  # 请确保此路径指向您的 JSON 密钥文件
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = service_account_path
-    if not os.path.exists(MODEL_PATH):
-        print("Download modle from icloud")
-        client = storage.Client()
-        bucket = client.bucket(MODEL_BUCKET)
-        blob = bucket.blob(MODEL_BLOB_NAME)
-        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-        blob.download_to_filename(MODEL_PATH)
-        print(f"Model {MODEL_BLOB_NAME} downloaded from bucket {MODEL_BUCKET} to {MODEL_PATH}.")
-
-download_model_from_gcs()
-model = load_model(MODEL_PATH)  # Now load_model uses the local path, which might have been just downloaded from GCS
+model = load_model('./best_model.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
 classes = {4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 
 @app.route('/')
