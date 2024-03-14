@@ -4,16 +4,19 @@ import os
 from werkzeug.utils import secure_filename
 import time
 import cv2
+from google.cloud import storage
 from tensorflow.keras.models import load_model
+import json
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app) # 允許跨域請求
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-model = load_model('./best_model.h5')
+
+model = load_model('./best_model.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
 classes = {4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 
 @app.route('/')
@@ -29,7 +32,7 @@ def upload_image():
         return jsonify({'error': 'No selected file'}), 400
     if file:
         filename = secure_filename(file.filename)
-        filepath = os.path.join('uploads', filename)
+        filepath = os.path.join('project/uploads', filename)
         file.save(filepath)
         
         # 模拟分析过程
