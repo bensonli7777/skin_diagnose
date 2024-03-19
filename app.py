@@ -8,8 +8,8 @@ from google.cloud import storage
 from tensorflow.keras.models import load_model
 import json
 
-#這是測試
-test=0
+
+git_test = 0 # git test
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app) # 允許跨域請求
