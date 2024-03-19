@@ -9,7 +9,7 @@ from tensorflow.keras.models import load_model
 import json
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app) # 允許跨域請求
+CORS(app) # ???許跨???�?�?
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -35,7 +35,7 @@ def upload_image():
         filepath = os.path.join('project/uploads', filename)
         file.save(filepath)
         
-        # 模拟分析过程
+        # 模�?��????????�?
         result = analyze_image(filepath)
         
         return jsonify(result)
