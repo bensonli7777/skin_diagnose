@@ -16,9 +16,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
-model = load_model('./best_model.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
-classes = {4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
-
+model = load_model('project/model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
+classes = {7: ('nm','normal'), 4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 @app.route('/')
 def home():
     return render_template('index.html')
