@@ -37,6 +37,10 @@ button {
     background-color: #4CAF50; /* Green */
 }
 
+#uploadInput {
+    display: none;
+}
+
 #progressContainer {
     position: fixed;
     bottom: 15%;
@@ -84,6 +88,7 @@ button {
 /* Responsive Image */
 #preview {
     max-width: 100%;
+    max-height: 80vh;
     border: 1px solid #ddd;
     margin-bottom: 20px;
 }

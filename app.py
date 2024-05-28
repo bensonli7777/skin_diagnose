@@ -16,14 +16,18 @@ CORS(app) # 允許跨域請求
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
 
 
-model = load_model('project/model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
+model = load_model('model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
 classes = {7: ('nm','normal'), 4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 @app.route('/')
 def home():
     return render_template('index.html')
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -32,15 +36,18 @@ def upload_image():
     file = request.files['image']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    if file:
+    
+    if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        filepath = os.path.join('project/uploads', filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # 模拟分析过程
+        # 分析圖片
         result = analyze_image(filepath)
         
         return jsonify(result)
+    else:
+        return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -69,5 +76,5 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8000))
+    port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port)
