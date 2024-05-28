@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// 關掉的這部分是之後寫reset function會用到
 /*
 document.addEventListener('DOMContentLoaded', function() {
     const captureButton = document.getElementById('captureButton');
@@ -203,6 +204,7 @@ document.getElementById('restartButton').addEventListener('click', function() {
 });
 
 
+// 先關掉reset function，因為會把前一次的使用紀錄清空
 /*
 document.getElementById('restartButton').addEventListener('click', function() {
     resetAppState();
