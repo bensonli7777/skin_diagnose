@@ -1,13 +1,40 @@
+
 document.getElementById('startButton').addEventListener('click', function() {
     switchScreen('captureScreen');
-    openCamera();
+    openCamera(); // 這裡預設按下start後會直接打開相機鏡頭
 });
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('captureButton').addEventListener('click', function() {
         captureImage();
-    }); 
+    });
+    document.getElementById('uploadButton').addEventListener('click', function() {
+        document.getElementById('uploadInput').click();
+    });
+    document.getElementById('uploadInput').addEventListener('change', function(event) {
+        uploadImage(event);
+    });
 });
+
+// 關掉的這部分是之後寫reset function會用到
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    const captureButton = document.getElementById('captureButton');
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadInput = document.getElementById('uploadInput');
+    const cropButton = document.getElementById('cropButton');
+    const restartButton = document.getElementById('restartButton');
+
+    captureButton.addEventListener('click', captureImage);
+    uploadButton.addEventListener('click', () => uploadInput.click());
+    uploadInput.addEventListener('change', uploadImage);
+    cropButton.addEventListener('click', cropAndUploadImage);
+    restartButton.addEventListener('click', () => {
+        resetAppState();
+        switchScreen('welcomeScreen');
+    });
+});
+*/
 
 let cropper;
 
@@ -66,7 +93,36 @@ function captureImage() {
     }
 }
  
+function uploadImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            displayImageForCrop(e.target.result);
+        }
+        reader.readAsDataURL(file);
+    }
+}
 
+function displayImageForCrop(imageDataUrl) {
+    const preview = document.getElementById('preview');
+    preview.src = imageDataUrl;
+    preview.style.display = 'block';
+    preview.style.maxWidth = '100%';  
+    preview.style.maxHeight = '80vh'; 
+
+    if (cropper) {
+        cropper.destroy();
+    }
+    cropper = new Cropper(preview, {
+        aspectRatio: 1,
+        viewMode: 1,
+    });
+
+    switchScreen('cropScreen');
+    document.getElementById('cropContainer').style.display = 'block';
+    document.getElementById('cropButton').style.display = 'block';
+}
 
 document.getElementById('cropButton').addEventListener('click', function() {
     cropAndUploadImage();
@@ -146,6 +202,39 @@ document.getElementById('restartButton').addEventListener('click', function() {
     document.getElementById('analysisResult').style.display = 'none';
     document.getElementById('restartButton').style.display = 'none';
 });
+
+
+// 先關掉reset function，因為會把前一次的使用紀錄清空
+/*
+document.getElementById('restartButton').addEventListener('click', function() {
+    resetAppState();
+    switchScreen('welcomeScreen');
+});
+
+
+function resetAppState() {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    const preview = document.getElementById('preview');
+    preview.src = '';
+    preview.style.display = 'none';
+    document.getElementById('cropContainer').style.display = 'none';
+    document.getElementById('cropButton').style.display = 'none';
+    document.getElementById('progressContainer').style.display = 'none';
+    document.getElementById('analysisResult').style.display = 'none';
+    document.getElementById('restartButton').style.display = 'none';
+    const video = document.getElementById('video');
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+    // 清空文件輸入框的值
+    const uploadInput = document.getElementById('uploadInput');
+    uploadInput.value = '';
+}
+*/
 
 function switchScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
