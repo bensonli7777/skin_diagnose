@@ -12,7 +12,7 @@ import json
 git_test = 0 # git test
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app) # 允許跨域請求
+CORS(app) # ???è¨±è·¨???è«?æ±?
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -42,7 +42,6 @@ def upload_image():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # 分析圖片
         result = analyze_image(filepath)
         
         return jsonify(result)
