@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory, session
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
@@ -7,23 +7,52 @@ import cv2
 from google.cloud import storage
 from tensorflow.keras.models import load_model
 import json
-
-
-git_test = 0 # git test
+from user_database import register_user,login_user,view_users,insert_photo,retrieve_user_history
+import base64
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app) # ???許跨???�?�?
+CORS(app) # 允許跨域請求
+
+app.secret_key =  os.urandom(24)
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
-model = load_model('project/model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
+model = load_model('SKIN_DIAGNOSE/model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
 classes = {7: ('nm','normal'), 4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required'}), 400
+    success, message = register_user(username, password)
+    if success:
+        return jsonify({'message': message}), 200
+    else:
+        return jsonify({'message': message}), 400
+    
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    print(f"Login username {username}")
+    password = data.get('password')
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required'}), 400
+    success, user = login_user(username, password)
+    if success:
+        session['user'] = username  # 假設 user['id'] 是用戶 ID
+        return jsonify({'message': '登錄成功'}), 200
+    else:
+        return jsonify({'message': user}), 401
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -35,10 +64,19 @@ def upload_image():
     if file:
         filename = secure_filename(file.filename)
         filepath = os.path.join('project/uploads', filename)
+        print(f"filepath {filepath}")
         file.save(filepath)
         
-        # 模�?��????????�?
+        # 模擬分析過程
+        print("analyzing ...")
         result = analyze_image(filepath)
+        print(f"Session : {session}")
+        username = session.get('user')
+        print(f'username {username}')
+        if not username:
+            return jsonify({'error': 'User not logged in'}), 401
+        
+        insert_photo(username, filepath, f"{result['disease']}: {result['confidence']}")
         
         return jsonify(result)
 
@@ -63,7 +101,25 @@ def analyze_image(image_path):
         'disease': class_name,
         'confidence': round(max_prob * 100, 2)
     }
+    
+@app.route('/history', methods=['GET'])
+def history():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({'error': 'Username is required'}), 401
 
+    history_data = retrieve_user_history(username)
+    encoded_history = []
+    #print(f"Encodede history {encoded_history}")
+    for item in history_data:
+        encoded_photo = base64.b64encode(item['photo']).decode('utf-8')
+        encoded_history.append({
+            'upload_time': item['upload_time'].strftime('%Y-%m-%d %H:%M:%S'),
+            'photo': encoded_photo,
+            'diagnosis': item['diagnosis']
+        })
+
+    return jsonify({'history': encoded_history})
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -71,3 +127,4 @@ if not os.path.exists(UPLOAD_FOLDER):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
     app.run(host='0.0.0.0', port=port)
+

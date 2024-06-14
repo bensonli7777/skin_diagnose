@@ -33,6 +33,18 @@ button {
     cursor: pointer;
 }
 
+
+input {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+}
+
+
+
 #captureButton, #cropButton, #restartButton {
     background-color: #4CAF50; /* Green */
 }
@@ -45,12 +57,6 @@ button {
     background-color: #ddd;
 }
 
-#progressBar {
-    height: 20px;
-    background-color: #4CAF50;
-    width: 0%;
-    transition: width 0.4s ease-in-out;
-}
 
 #analysisResult {
     display: flex;

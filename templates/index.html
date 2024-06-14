@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,8 +10,30 @@
     <div id="welcomeScreen" class="screen active">
         <h1>歡迎使用智能皮膚診斷</h1>
         <p>簡單三步，快速了解情況</p>
-        <button id="startButton">帳號登錄</button>
-        
+        <button id="loginButton">帳號登錄</button>
+        <button id="registerButton">註冊</button>
+    </div>
+
+    <div id="registerScreen" class="screen">
+        <h2>註冊</h2>
+        <form id="registerForm">
+            <input type="text" id="registerUsername" placeholder="用戶名" required>
+            <input type="password" id="registerPassword" placeholder="密碼" required>
+            <button type="submit">註冊</button>
+        </form>
+        <button id="backToLoginButton">已有帳戶？ 登入</button>
+        <button id="backToWelcomeButton">返回</button>
+    </div>
+    
+    <div id="loginScreen" class="screen">
+        <h2>帳號登入</h2>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="用戶名" required>
+            <input type="password" id="loginPassword" placeholder="密碼" required>
+            <button type="submit">登入</button>
+        </form>
+        <button id="backToRegisterButton">沒有帳戶？ 註冊</button>
+        <button id="backToWelcomeButton">返回</button>
     </div>
     
     <div id="captureScreen" class="screen">
@@ -33,8 +54,15 @@
         </div>
         <div id="analysisResult" style="display:none;"></div>
         <button id="restartButton" style="display:none;">重新開始</button>
+        <button id="historybutton">查看歷史資料紀錄</button>
     </div>
     
+    <div id="historyScreen" class="screen">
+        <h2>歷史資料</h2>
+        <div id="history"></div>
+        <button id="backToWelcomeButton">返回</button>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
 </body>
