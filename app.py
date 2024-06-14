@@ -11,12 +11,14 @@ from user_database import register_user,login_user,view_users,insert_photo,retri
 import base64
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+
 CORS(app) # 允許跨域請求
 
 app.secret_key =  os.urandom(24)
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
 
 
@@ -53,6 +55,8 @@ def login():
         return jsonify({'message': '登錄成功'}), 200
     else:
         return jsonify({'message': user}), 401
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -61,7 +65,8 @@ def upload_image():
     file = request.files['image']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    if file:
+    
+    if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join('project/uploads', filename)
         print(f"filepath {filepath}")
@@ -79,6 +84,8 @@ def upload_image():
         insert_photo(username, filepath, f"{result['disease']}: {result['confidence']}")
         
         return jsonify(result)
+    else:
+        return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -125,6 +132,6 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8000))
+    port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port)
 

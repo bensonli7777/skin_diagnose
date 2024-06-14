@@ -30,7 +30,7 @@
         <form id="loginForm">
             <input type="text" id="loginUsername" placeholder="用戶名" required>
             <input type="password" id="loginPassword" placeholder="密碼" required>
-            <button type="submit">登入</button>
+            <button type="submit" id="enterbutton">登入</button>
         </form>
         <button id="backToRegisterButton">沒有帳戶？ 註冊</button>
         <button id="backToWelcomeButton">返回</button>
@@ -39,6 +39,8 @@
     <div id="captureScreen" class="screen">
         <video id="video" style="display:none;"></video>
         <button id="captureButton">📷 拍照</button>
+        <input type="file" id="uploadInput" accept="image/*" style="display: none;">
+        <button id="uploadButton">📁 上傳照片</button>
     </div>
     
     <div id="cropScreen" class="screen">
@@ -60,7 +62,7 @@
     <div id="historyScreen" class="screen">
         <h2>歷史資料</h2>
         <div id="history"></div>
-        <button id="backToWelcomeButton">返回</button>
+        <button id="backToresultButton">返回</button>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

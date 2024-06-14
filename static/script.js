@@ -1,73 +1,48 @@
 document.addEventListener('DOMContentLoaded', function() {
     const screens = document.querySelectorAll('.screen');
     const loginButton = document.getElementById('loginButton');
-    const backToWelcomeButtons = document.querySelectorAll('#backToWelcomeButton');
     const registerButton = document.getElementById('registerButton');
+    const enterButton = document.getElementById('enterbutton');
+    const backToresultButton = document.querySelectorAll('#backToresultButton');
     const backToLoginButton = document.getElementById('backToLoginButton');
     const backToRegisterButton = document.getElementById('backToRegisterButton');
     const captureButton = document.getElementById('captureButton');
     const cropButton = document.getElementById('cropButton');
     const restartButton = document.getElementById('restartButton');
-    const historybutton = document.getElementById('historybutton');
+    const historyButton = document.getElementById('historybutton');
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadInput = document.getElementById('uploadInput');
+    let cropper;
 
     const showScreen = (screenId) => {
         screens.forEach(screen => screen.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
     };
 
-    loginButton.addEventListener('click', () => {
-        switchScreen('loginScreen');
+    loginButton.addEventListener('click', () => showScreen('loginScreen'));
+    registerButton.addEventListener('click', () => showScreen('registerScreen'));
+    backToLoginButton.addEventListener('click', () => showScreen('loginScreen'));
+    backToRegisterButton.addEventListener('click', () => showScreen('registerScreen'));
+    restartButton.addEventListener('click', () => showScreen('captureScreen'));
+    backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
+
+    enterButton.addEventListener('click', () => {
+        showScreen('captureScreen');
+        openCamera();
     });
 
-    registerButton.addEventListener('click', () => {
-        switchScreen('registerScreen');
-    });
-
-    backToLoginButton.addEventListener('click', () => {
-        switchScreen('loginScreen');
-    });
-
-    backToRegisterButton.addEventListener('click', () => {
-        switchScreen('registerScreen');
-    });
-    historybutton.addEventListener('click', () => {
-        switchScreen('historyScreen');
-    });
-
-    captureButton.addEventListener('click', () => {
-        captureImage();
-        showScreen('cropScreen');
-    });
-
-    cropButton.addEventListener('click', () => {
-        cropAndUploadImage();
-        showScreen('resultScreen');
-    });
-
-    restartButton.addEventListener('click', () => showScreen('welcomeScreen'));
-
-    backToWelcomeButtons.forEach(button => button.addEventListener('click', () => showScreen('welcomeScreen')));
+    captureButton.addEventListener('click', captureImage);
+    cropButton.addEventListener('click', cropAndUploadImage);
+    uploadButton.addEventListener('click', () => uploadInput.click());
+    uploadInput.addEventListener('change', uploadImage);
+    historyButton.addEventListener('click', fetchHistory);
 
     // Login form submission
     document.getElementById('loginForm').addEventListener('submit', (event) => {
         event.preventDefault();
         const username = document.getElementById('loginUsername').value;
         const password = document.getElementById('loginPassword').value;
-        fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === '登錄成功') {
-                sessionStorage.setItem('username', username);
-                showScreen('captureScreen');
-                openCamera();
-            } else {
-                alert('登錄失敗');
-            }
-        });
+        loginUser(username, password);
     });
 
     // Register form submission
@@ -75,37 +50,21 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         const username = document.getElementById('registerUsername').value;
         const password = document.getElementById('registerPassword').value;
-        fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === '註冊成功') {
-                showScreen('loginScreen');
-            } else {
-                alert('註冊失敗');
-            }
-        });
+        registerUser(username, password);
     });
 
-    let cropper;
-
     function openCamera() {
-        navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "user" }
-        })
-        .then(function(stream) {
-            const video = document.getElementById('video');
-            video.srcObject = stream;
-            video.play();
-            video.style.display = 'block';
-            captureButton.style.display = 'block';
-        })
-        .catch(function(error) {
-            console.error("獲取攝像頭失敗", error);
-        });
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(function(stream) {
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.play();
+                video.style.display = 'block';
+                captureButton.style.display = 'block';
+            })
+            .catch(function(error) {
+                console.error("獲取攝像頭失敗", error);
+            });
     }
 
     function captureImage() {
@@ -115,38 +74,52 @@ document.addEventListener('DOMContentLoaded', function() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            
             video.srcObject.getTracks().forEach(track => track.stop());
             video.style.display = 'none';
-            
+
             const imageDataUrl = canvas.toDataURL('image/png');
-            const preview = document.getElementById('preview');
-            preview.src = imageDataUrl;
-            preview.style.display = 'block';
-            
-            if (cropper) {
-                cropper.destroy();
-            }
-            cropper = new Cropper(preview, {
-                aspectRatio: 1,
-                viewMode: 1,
-            });
-            
-            switchScreen('cropScreen');
-            document.getElementById('cropContainer').style.display = 'block';
-            cropButton.style.display = 'block';
+            initializeCropper(imageDataUrl);
         } else {
             console.error("無法訪問攝像頭");
         }
+    }
+
+    function uploadImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                initializeCropper(e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function initializeCropper(imageDataUrl) {
+        const preview = document.getElementById('preview');
+        preview.src = imageDataUrl;
+        preview.style.display = 'block';
+
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(preview, {
+            aspectRatio: 1,
+            viewMode: 1,
+        });
+
+        showScreen('cropScreen');
+        document.getElementById('cropContainer').style.display = 'block';
+        cropButton.style.display = 'block';
     }
 
     function cropAndUploadImage() {
         cropper.getCroppedCanvas().toBlob(function(blob) {
             const formData = new FormData();
             formData.append('image', blob, 'croppedImage.png');
-    
+
             showProgress();
-    
+
             fetch('/upload', {
                 method: 'POST',
                 body: formData,
@@ -162,9 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error("Error uploading image:", error);
-            })
-            .finally(() => {
-                // Hide the progress bar here or in the .then block
             });
         });
     }
@@ -183,10 +153,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResult(data) {
-        switchScreen('resultScreen');
+        showScreen('resultScreen');
         const croppedImageElement = document.getElementById('croppedImage');
         croppedImageElement.src = data.imageSrc;
-    
+
         const analysisResultElement = document.getElementById('analysisResult');
         analysisResultElement.innerHTML = `
             <p>診斷結果</p>
@@ -196,13 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
         restartButton.style.display = 'block';
     }
 
-    historybutton.addEventListener('click', () => {
+    function fetchHistory() {
         const username = sessionStorage.getItem('username');
         if (username) {
             fetch(`/history?username=${username}`)
             .then(response => response.json())
             .then(data => {
-                console.log("History data received", data)
                 const historyDiv = document.getElementById('history');
                 historyDiv.innerHTML = '';
                 data.history.forEach(entry => {
@@ -219,12 +188,39 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error('No username found in session storage.');
         }
-    });
-});
+    }
 
-function switchScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    document.getElementById(screenId).classList.add('active');
-}
+    function loginUser(username, password) {
+        fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === '登錄成功') {
+                sessionStorage.setItem('username', username);
+                showScreen('captureScreen');
+                openCamera();
+            } else {
+                alert('登錄失敗');
+            }
+        });
+    }
+
+    function registerUser(username, password) {
+        fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === '註冊成功') {
+                showScreen('loginScreen');
+            } else {
+                alert('註冊失敗');
+            }
+        });
+    }
+});
