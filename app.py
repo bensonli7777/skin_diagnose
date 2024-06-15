@@ -52,7 +52,7 @@ def login():
     success, user = login_user(username, password)
     if success:
         session['user'] = username  # 假設 user['id'] 是用戶 ID
-        return jsonify({'message': '登錄成功'}), 200
+        return jsonify({'message': '登入成功'}), 200
     else:
         return jsonify({'message': user}), 401
 def allowed_file(filename):

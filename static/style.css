@@ -13,13 +13,13 @@ body, html {
     display: none;
     text-align: center;
     width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .screen.active {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 button {
@@ -33,7 +33,6 @@ button {
     cursor: pointer;
 }
 
-
 input {
     padding: 10px;
     margin: 5px 0;
@@ -42,8 +41,6 @@ input {
     width: 100%;
     max-width: 300px;
 }
-
-
 
 #captureButton, #cropButton, #restartButton {
     background-color: #4CAF50; /* Green */
@@ -60,7 +57,6 @@ input {
     left: 10%;
     background-color: #ddd;
 }
-
 
 #analysisResult {
     display: flex;
@@ -133,4 +129,59 @@ input {
     height: 200px; /* Set the height of the cropped image */
     object-fit: cover; /* Ensure the aspect ratio is maintained without stretching the image */
     margin-bottom: 20px; /* Add some space between the image and the text result */
+}
+
+.history-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 150px; /* Add margin to avoid overlap with fixed header */
+}
+
+.history-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #cc1c;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.history-photo {
+    width: 150px; /* 設定照片的固定寬度 */
+    height: 150px; /* 設定照片的固定高度 */
+    object-fit: cover; /* 保持照片比例並裁切 */
+}
+
+.history-info {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Header styles */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color:#4CAF50;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 20px;
+    z-index: 10;
+}
+
+.header h2 {
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+#usernameDisplay {
+    font-size: 18px;
+    font-weight: bold;
 }

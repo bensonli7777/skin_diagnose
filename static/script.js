@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const historyButton = document.getElementById('historybutton');
     const uploadButton = document.getElementById('uploadButton');
     const uploadInput = document.getElementById('uploadInput');
+    const backToWelcomeButtont = document.getElementById('backToWelcomeButton');
+    const logoutButton = document.getElementById('logoutButton');
     let cropper;
 
     const showScreen = (screenId) => {
@@ -20,15 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     loginButton.addEventListener('click', () => showScreen('loginScreen'));
+    backToWelcomeButtont.addEventListener('click', () => showScreen('welcomeScreen'));
     registerButton.addEventListener('click', () => showScreen('registerScreen'));
     backToLoginButton.addEventListener('click', () => showScreen('loginScreen'));
     backToRegisterButton.addEventListener('click', () => showScreen('registerScreen'));
-    restartButton.addEventListener('click', () => showScreen('captureScreen'));
     backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
 
-    enterButton.addEventListener('click', () => {
+    restartButton.addEventListener('click', () => {
         showScreen('captureScreen');
         openCamera();
+    });
+    backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
+    logoutButton.addEventListener('click', () => {
+        sessionStorage.removeItem('username');
+        showScreen('welcomeScreen');
     });
 
     captureButton.addEventListener('click', captureImage);
@@ -36,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     uploadButton.addEventListener('click', () => uploadInput.click());
     uploadInput.addEventListener('change', uploadImage);
     historyButton.addEventListener('click', fetchHistory);
+   
 
     // Login form submission
     document.getElementById('loginForm').addEventListener('submit', (event) => {
@@ -169,18 +177,28 @@ document.addEventListener('DOMContentLoaded', function() {
     function fetchHistory() {
         const username = sessionStorage.getItem('username');
         if (username) {
+            document.getElementById('usernameDisplay').innerText = `${username}`;
+            
             fetch(`/history?username=${username}`)
             .then(response => response.json())
             .then(data => {
                 const historyDiv = document.getElementById('history');
                 historyDiv.innerHTML = '';
                 data.history.forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('history-entry');
+                    
                     const photoImg = new Image();
                     photoImg.src = 'data:image/jpeg;base64,' + entry.photo;
-                    historyDiv.appendChild(photoImg);
+                    photoImg.classList.add('history-photo');
+                    entryDiv.appendChild(photoImg);
+                    
                     const infoDiv = document.createElement('div');
+                    infoDiv.classList.add('history-info');
                     infoDiv.innerHTML = `Upload Time: ${entry.upload_time} <br> Diagnosis: ${entry.diagnosis}`;
-                    historyDiv.appendChild(infoDiv);
+                    entryDiv.appendChild(infoDiv);
+                    
+                    historyDiv.appendChild(entryDiv);
                 });
                 showScreen('historyScreen');
             })
@@ -189,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('No username found in session storage.');
         }
     }
+    
 
     function loginUser(username, password) {
         fetch('/login', {
@@ -198,12 +217,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message === '登錄成功') {
+            if (data.message === '登入成功') {
                 sessionStorage.setItem('username', username);
                 showScreen('captureScreen');
                 openCamera();
             } else {
-                alert('登錄失敗');
+                alert('登入失敗');
             }
         });
     }

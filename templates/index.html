@@ -10,7 +10,7 @@
     <div id="welcomeScreen" class="screen active">
         <h1>歡迎使用智能皮膚診斷</h1>
         <p>簡單三步，快速了解情況</p>
-        <button id="loginButton">帳號登錄</button>
+        <button id="loginButton">帳號登入</button>
         <button id="registerButton">註冊</button>
     </div>
 
@@ -19,21 +19,25 @@
         <form id="registerForm">
             <input type="text" id="registerUsername" placeholder="用戶名" required>
             <input type="password" id="registerPassword" placeholder="密碼" required>
+            <br>
             <button type="submit">註冊</button>
         </form>
-        <button id="backToLoginButton">已有帳戶？ 登入</button>
-        <button id="backToWelcomeButton">返回</button>
+        <div>
+            <button id="backToLoginButton">已有帳戶？ 登入</button>
+            <button id="backToWelcomeButton">返回</button>
+        </div>
+        
     </div>
-    
+
     <div id="loginScreen" class="screen">
         <h2>帳號登入</h2>
         <form id="loginForm">
             <input type="text" id="loginUsername" placeholder="用戶名" required>
             <input type="password" id="loginPassword" placeholder="密碼" required>
-            <button type="submit" id="enterbutton">登入</button>
+            <br>
+            <button type="submit">登入</button>
         </form>
-        <button id="backToRegisterButton">沒有帳戶？ 註冊</button>
-        <button id="backToWelcomeButton">返回</button>
+        <button id="backToRegisterButton">沒有帳戶? 註冊</button>
     </div>
     
     <div id="captureScreen" class="screen">
@@ -60,10 +64,17 @@
     </div>
     
     <div id="historyScreen" class="screen">
-        <h2>歷史資料</h2>
-        <div id="history"></div>
-        <button id="backToresultButton">返回</button>
+        <div id="historyHeader" class="header">
+            <h2>歷史診斷</h2>
+            <div id="usernameDisplay">用戶名</div> <!-- 顯示用戶名 -->
+        </div>
+        <div id="history" class="history-container"></div>
+        <div>
+            <button id="backToresultButton">返回</button>
+            <button id="logoutButton">登出</button>
+        </div>
     </div>
+    
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
