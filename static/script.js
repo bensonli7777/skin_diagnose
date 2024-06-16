@@ -1,205 +1,248 @@
-
-document.getElementById('startButton').addEventListener('click', function() {
-    switchScreen('captureScreen');
-    openCamera(); // 這裡預設按下start後會直接打開相機鏡頭
-});
-
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('captureButton').addEventListener('click', function() {
-        captureImage();
-    });
-    document.getElementById('uploadButton').addEventListener('click', function() {
-        document.getElementById('uploadInput').click();
-    });
-    document.getElementById('uploadInput').addEventListener('change', function(event) {
-        uploadImage(event);
-    });
-    document.getElementById('backButton').addEventListener('click', function() {
-        switchScreen('resultScreen');
-    });
-});
+    const screens = document.querySelectorAll('.screen');
+    const loginButton = document.getElementById('loginButton');
+    const registerButton = document.getElementById('registerButton');
+    const enterButton = document.getElementById('enterbutton');
+    const backToresultButton = document.querySelectorAll('#backToresultButton');
+    const backToLoginButton = document.getElementById('backToLoginButton');
+    const backToRegisterButton = document.getElementById('backToRegisterButton');
+    const captureButton = document.getElementById('captureButton');
+    const cropButton = document.getElementById('cropButton');
+    const restartButton = document.getElementById('restartButton');
+    const historyButton = document.getElementById('historybutton');
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadInput = document.getElementById('uploadInput');
+    const backToWelcomeButtont = document.getElementById('backToWelcomeButton');
+    const logoutButton = document.getElementById('logoutButton');
+    let cropper;
 
-let cropper;
+    const showScreen = (screenId) => {
+        screens.forEach(screen => screen.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    };
 
-function openCamera() {
-    navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user" }
-    })
-    .then(function(stream) {
+    loginButton.addEventListener('click', () => showScreen('loginScreen'));
+    backToWelcomeButtont.addEventListener('click', () => showScreen('welcomeScreen'));
+    registerButton.addEventListener('click', () => showScreen('registerScreen'));
+    backToLoginButton.addEventListener('click', () => showScreen('loginScreen'));
+    backToRegisterButton.addEventListener('click', () => showScreen('registerScreen'));
+    backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
+
+    restartButton.addEventListener('click', () => {
+        showScreen('captureScreen');
+        openCamera();
+    });
+    backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
+    logoutButton.addEventListener('click', () => {
+        sessionStorage.removeItem('username');
+        showScreen('welcomeScreen');
+    });
+
+    captureButton.addEventListener('click', captureImage);
+    cropButton.addEventListener('click', cropAndUploadImage);
+    uploadButton.addEventListener('click', () => uploadInput.click());
+    uploadInput.addEventListener('change', uploadImage);
+    historyButton.addEventListener('click', fetchHistory);
+   
+
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        loginUser(username, password);
+    });
+
+
+    // Register form submission
+    document.getElementById('registerForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const username = document.getElementById('registerUsername').value;
+        const password = document.getElementById('registerPassword').value;
+        registerUser(username, password);
+    });
+
+    function openCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(function(stream) {
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.play();
+                video.style.display = 'block';
+                captureButton.style.display = 'block';
+            })
+            .catch(function(error) {
+                console.error("獲取攝像頭失敗", error);
+            });
+    }
+
+    function captureImage() {
         const video = document.getElementById('video');
-        video.srcObject = stream;
-        video.play();
-        video.style.display = 'block'; // 显示 video 元素
-        document.getElementById('captureButton').style.display = 'block';
-    })
-    .catch(function(error) {
-        console.error("获取摄像头失败", error);
-    });
-}
-function captureImage() {
-    const video = document.getElementById('video');
-    console.log("嘗試捕捉照片")
-    // 检查video是否有srcObject属性，且srcObject不是null
-    if (video && video.srcObject) {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // 现在可以安全地停止媒体流
-        video.srcObject.getTracks().forEach(track => track.stop());
-        
-        // 隐藏video元素
-        video.style.display = 'none';
-        
-        const imageDataUrl = canvas.toDataURL('image/png');
+        if (video && video.srcObject) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            video.srcObject.getTracks().forEach(track => track.stop());
+            video.style.display = 'none';
+
+            const imageDataUrl = canvas.toDataURL('image/png');
+            initializeCropper(imageDataUrl);
+        } else {
+            console.error("無法訪問攝像頭");
+        }
+    }
+
+    function uploadImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                initializeCropper(e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function initializeCropper(imageDataUrl) {
         const preview = document.getElementById('preview');
         preview.src = imageDataUrl;
         preview.style.display = 'block';
-        
-        // 初始化裁切器
+
         if (cropper) {
-            cropper.destroy(); // 销毁旧的裁切实例
+            cropper.destroy();
         }
         cropper = new Cropper(preview, {
             aspectRatio: 1,
             viewMode: 1,
         });
-        console.log("Cropper has been initialized.");
-        
-        // 显示裁切容器和裁切按钮
-        switchScreen('cropScreen');
+
+        showScreen('cropScreen');
         document.getElementById('cropContainer').style.display = 'block';
-        document.getElementById('cropButton').style.display = 'block';
-    } else {
-        console.error("無法訪問攝像頭");
+        cropButton.style.display = 'block';
     }
-}
- 
-function uploadImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            displayImageForCrop(e.target.result);
+
+    function cropAndUploadImage() {
+        cropper.getCroppedCanvas().toBlob(function(blob) {
+            const formData = new FormData();
+            formData.append('image', blob, 'croppedImage.png');
+
+            showProgress();
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                showResult({
+                    status: data.status,
+                    disease: data.disease,
+                    confidence: data.confidence + '%',
+                    imageSrc: URL.createObjectURL(blob)
+                });
+            })
+            .catch(error => {
+                console.error("Error uploading image:", error);
+            });
+        });
+    }
+
+    function showProgress() {
+        const progressContainer = document.getElementById('progressContainer');
+        progressContainer.style.display = 'block';
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            if (progress >= 100) {
+                clearInterval(interval);
+                progressContainer.style.display = 'none';
+            }
+        }, 300);
+    }
+
+    function showResult(data) {
+        showScreen('resultScreen');
+        const croppedImageElement = document.getElementById('croppedImage');
+        croppedImageElement.src = data.imageSrc;
+
+        const analysisResultElement = document.getElementById('analysisResult');
+        analysisResultElement.innerHTML = `
+            <p>診斷結果</p>
+            <div class="result-conclusion">${data.disease} 概率 ${data.confidence}</div>
+        `;
+        analysisResultElement.style.display = 'flex';
+        restartButton.style.display = 'block';
+    }
+
+    function fetchHistory() {
+        const username = sessionStorage.getItem('username');
+        if (username) {
+            document.getElementById('usernameDisplay').innerText = `${username}`;
+            
+            fetch(`/history?username=${username}`)
+            .then(response => response.json())
+            .then(data => {
+                const historyDiv = document.getElementById('history');
+                historyDiv.innerHTML = '';
+                data.history.forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('history-entry');
+                    
+                    const photoImg = new Image();
+                    photoImg.src = 'data:image/jpeg;base64,' + entry.photo;
+                    photoImg.classList.add('history-photo');
+                    entryDiv.appendChild(photoImg);
+                    
+                    const infoDiv = document.createElement('div');
+                    infoDiv.classList.add('history-info');
+                    infoDiv.innerHTML = `Upload Time: ${entry.upload_time} <br> Diagnosis: ${entry.diagnosis}`;
+                    entryDiv.appendChild(infoDiv);
+                    
+                    historyDiv.appendChild(entryDiv);
+                });
+                showScreen('historyScreen');
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.error('No username found in session storage.');
         }
-        reader.readAsDataURL(file);
     }
-}
+    
 
-function displayImageForCrop(imageDataUrl) {
-    const preview = document.getElementById('preview');
-    preview.src = imageDataUrl;
-    preview.style.display = 'block';
-    preview.style.maxWidth = '100%';  
-    preview.style.maxHeight = '80vh'; 
-
-    if (cropper) {
-        cropper.destroy();
-    }
-    cropper = new Cropper(preview, {
-        aspectRatio: 1,
-        viewMode: 1,
-    });
-
-    switchScreen('cropScreen');
-    document.getElementById('cropContainer').style.display = 'block';
-    document.getElementById('cropButton').style.display = 'block';
-}
-
-document.getElementById('cropButton').addEventListener('click', function() {
-    cropAndUploadImage();
-});
-function cropAndUploadImage() {
-    cropper.getCroppedCanvas().toBlob(function(blob) {
-        const formData = new FormData();
-        formData.append('image', blob, 'croppedImage.png');
-
-        // Start showing the progress bar
-        showProgress();
-
-        // Use fetch to upload the cropped image to the server
-        fetch('/upload', {
+    function loginUser(username, password) {
+        fetch('/login', {
             method: 'POST',
-            body: formData,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Upload and analysis complete", data);
-            // Handle the server response here
-            showResult({
-                status: data.status,
-                disease: data.disease,
-                confidence: data.confidence + '%',
-                imageSrc: URL.createObjectURL(blob) // Display the local cropped image
-            });
-        })
-        .catch(error => {
-            console.error("Error uploading image:", error);
-        })
-        .finally(() => {
-            // Hide the progress bar here or in the .then block
+            if (data.message === '登入成功') {
+                sessionStorage.setItem('username', username);
+                showScreen('captureScreen');
+                openCamera();
+            } else {
+                alert('登入失敗');
+            }
         });
-    });
-}
 
+    }
 
-function showProgress() {
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    progressContainer.style.display = 'none';//turn this into none to hide it. Turn on :block
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 10;
-        progressBar.style.width = `${progress}%`;
-        if (progress >= 100) {
-            clearInterval(interval);
-            progressContainer.style.display = 'none';
-            progressBar.style.width = `0%`;
-            
-        } 
-    }, 300);
-}
-
-
-function showResult(data) {
-    switchScreen('resultScreen');
-    
-    // Ensure the cropped image is shown
-    const croppedImageElement = document.getElementById('croppedImage');
-    croppedImageElement.src = data.imageSrc; // Set the source of the cropped image
-
-    // Display the analysis result
-    const analysisResultElement = document.getElementById('analysisResult');
-    analysisResultElement.innerHTML = `
-        <p>診斷結果</p>
-        <div class="result-conclusion">${data.disease} 概率 ${data.confidence}</div>
-    `;
-    analysisResultElement.style.display = 'flex'; // Ensure this element is displayed
-    
-    const diseaseInfoButton = document.getElementById('diseaseInfoButton');
-    diseaseInfoButton.style.display = 'block';
-    diseaseInfoButton.onclick = function() {
-        navigateToDiseaseInfo(data.disease);
-    };
-    document.getElementById('restartButton').style.display = 'block';
-}
-
-function navigateToDiseaseInfo(disease) {
-    window.location.href = `/disease/${disease}`;
-}
-
-document.getElementById('restartButton').addEventListener('click', function() {
-    switchScreen('welcomeScreen');
-    document.getElementById('analysisResult').style.display = 'none';
-    document.getElementById('restartButton').style.display = 'none';
-    document.getElementById('diseaseInfoButton').style.display = 'none';
+    function registerUser(username, password) {
+        fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === '註冊成功') {
+                showScreen('loginScreen');
+            } else {
+                alert('註冊失敗');
+            }
+        });
+    }
 });
 
-
-function switchScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    document.getElementById(screenId).classList.add('active');
-}
