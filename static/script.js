@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginUser(username, password);
     });
 
+
     // Register form submission
     document.getElementById('registerForm').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -225,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('登入失敗');
             }
         });
+
     }
 
     function registerUser(username, password) {
@@ -243,3 +245,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+

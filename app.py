@@ -14,16 +14,22 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 
 CORS(app) # 允許跨域請求
 
+
 app.secret_key =  os.urandom(24)
+
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
+# 導入disease_info函數
+from disease_info import disease_info
+app.register_blueprint(disease_info)
 
 
-model = load_model('SKIN_DIAGNOSE/model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
-classes = {7: ('nm','normal'), 4: ('nv', ' melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
+model = load_model('model_extended.h5') # Now load_model uses the local path, which might have been just downloaded from GCS
+classes = {7: ('nm','normal'), 4: ('nv', 'melanocytic nevi'), 6: ('mel', 'melanoma'), 2 :('bkl', 'benign keratosis-like lesions'), 1:('bcc' , ' basal cell carcinoma'), 5: ('vasc', ' pyogenic granulomas and hemorrhage'), 0: ('akiec', 'Actinic keratoses and intraepithelial carcinomae'),  3: ('df', 'dermatofibroma')}
+
 @app.route('/')
 def home():
     return render_template('index.html')
