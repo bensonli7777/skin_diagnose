@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadInput = document.getElementById('uploadInput');
     const backToWelcomeButtont = document.getElementById('backToWelcomeButton');
     const logoutButton = document.getElementById('logoutButton');
+    const diseaseInfoButton = document.getElementById('diseaseInfoButton');
     let cropper;
 
     const showScreen = (screenId) => {
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     registerButton.addEventListener('click', () => showScreen('registerScreen'));
     backToLoginButton.addEventListener('click', () => showScreen('loginScreen'));
     backToRegisterButton.addEventListener('click', () => showScreen('registerScreen'));
+    diseaseInfoButton.addEventListener('click', () => showScreen('diseaseInfoScreen'));
     backToresultButton.forEach(button => button.addEventListener('click', () => showScreen('resultScreen')));
 
     restartButton.addEventListener('click', () => {
