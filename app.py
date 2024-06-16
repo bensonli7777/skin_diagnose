@@ -12,12 +12,13 @@ import json
 git_test = 0 # git test
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app) # ???è¨±è·¨???è«?æ±?
+CORS(app) 
 
 UPLOAD_FOLDER = 'project/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
+# 導入disease_info函數
 from disease_info import disease_info
 app.register_blueprint(disease_info)
 

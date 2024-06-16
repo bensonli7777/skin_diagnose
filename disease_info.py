@@ -46,5 +46,6 @@ def disease(disease_name):
             'treatment': '治療方法:手術切除'
         },    
     }  
+    # 判斷不同疾病名稱決定提取哪個data
     info = disease_data.get(disease_name)
     return render_template('disease_info.html', info=info)
