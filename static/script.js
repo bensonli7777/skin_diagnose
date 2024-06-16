@@ -14,27 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('uploadInput').addEventListener('change', function(event) {
         uploadImage(event);
     });
-});
-
-// 關掉的這部分是之後寫reset function會用到
-/*
-document.addEventListener('DOMContentLoaded', function() {
-    const captureButton = document.getElementById('captureButton');
-    const uploadButton = document.getElementById('uploadButton');
-    const uploadInput = document.getElementById('uploadInput');
-    const cropButton = document.getElementById('cropButton');
-    const restartButton = document.getElementById('restartButton');
-
-    captureButton.addEventListener('click', captureImage);
-    uploadButton.addEventListener('click', () => uploadInput.click());
-    uploadInput.addEventListener('change', uploadImage);
-    cropButton.addEventListener('click', cropAndUploadImage);
-    restartButton.addEventListener('click', () => {
-        resetAppState();
-        switchScreen('welcomeScreen');
+    document.getElementById('backButton').addEventListener('click', function() {
+        switchScreen('resultScreen');
     });
 });
-*/
 
 let cropper;
 
@@ -178,6 +161,7 @@ function showProgress() {
     }, 300);
 }
 
+
 function showResult(data) {
     switchScreen('resultScreen');
     
@@ -192,49 +176,26 @@ function showResult(data) {
         <div class="result-conclusion">${data.disease} 概率 ${data.confidence}</div>
     `;
     analysisResultElement.style.display = 'flex'; // Ensure this element is displayed
-
+    
+    const diseaseInfoButton = document.getElementById('diseaseInfoButton');
+    diseaseInfoButton.style.display = 'block';
+    diseaseInfoButton.onclick = function() {
+        navigateToDiseaseInfo(data.disease);
+    };
     document.getElementById('restartButton').style.display = 'block';
 }
 
-
-document.getElementById('restartButton').addEventListener('click', function() {
-    switchScreen('welcomeScreen');
-    document.getElementById('analysisResult').style.display = 'none';
-    document.getElementById('restartButton').style.display = 'none';
-});
-
-
-// 先關掉reset function，因為會把前一次的使用紀錄清空
-/*
-document.getElementById('restartButton').addEventListener('click', function() {
-    resetAppState();
-    switchScreen('welcomeScreen');
-});
-
-
-function resetAppState() {
-    if (cropper) {
-        cropper.destroy();
-        cropper = null;
-    }
-    const preview = document.getElementById('preview');
-    preview.src = '';
-    preview.style.display = 'none';
-    document.getElementById('cropContainer').style.display = 'none';
-    document.getElementById('cropButton').style.display = 'none';
-    document.getElementById('progressContainer').style.display = 'none';
-    document.getElementById('analysisResult').style.display = 'none';
-    document.getElementById('restartButton').style.display = 'none';
-    const video = document.getElementById('video');
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-    }
-    // 清空文件輸入框的值
-    const uploadInput = document.getElementById('uploadInput');
-    uploadInput.value = '';
+function navigateToDiseaseInfo(disease) {
+    window.location.href = `/disease/${disease}`;
 }
-*/
+
+document.getElementById('restartButton').addEventListener('click', function() {
+    switchScreen('welcomeScreen');
+    document.getElementById('analysisResult').style.display = 'none';
+    document.getElementById('restartButton').style.display = 'none';
+    document.getElementById('diseaseInfoButton').style.display = 'none';
+});
+
 
 function switchScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {

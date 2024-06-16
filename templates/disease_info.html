@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ info.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
+        #diseaseTitle {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #diseaseDescription {
+            text-align: center;
+            font-size: 1.2em;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        #treatmentMethod {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        #backButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="diseaseInfoScreen">
+        <h1 id="diseaseTitle">{{ info.title }}</h1>
+        <div id="diseaseDescription">{{ info.description }}</div>
+        <div id="treatmentMethod">治療方法：{{ info.treatment }}</div>
+        <button id="backButton" onclick="window.history.back();">返回</button>
+    </div>
+</body>
+</html>

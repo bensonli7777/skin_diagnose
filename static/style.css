@@ -128,3 +128,16 @@ button {
     object-fit: cover; /* Ensure the aspect ratio is maintained without stretching the image */
     margin-bottom: 20px; /* Add some space between the image and the text result */
 }
+#diseaseInfoScreen {
+    text-align: center;
+    padding: 20px;
+}
+
+#backButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
