@@ -4,6 +4,8 @@ disease_info = Blueprint('disease_info', __name__)
 
 @disease_info.route('/disease/<disease_name>')
 def disease(disease_name):
+    print("Ck")
+    print(disease_name)
     disease_data = {
         'nm,normal': {
             'title': '正常皮膚',

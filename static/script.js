@@ -163,6 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     }
 
+    function navigateToDiseaseInfo(disease) {
+        window.location.href = `/disease/${disease}`;
+    }
+
     function showResult(data) {
         showScreen('resultScreen');
         const croppedImageElement = document.getElementById('croppedImage');
@@ -174,6 +178,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="result-conclusion">${data.disease} 概率 ${data.confidence}</div>
         `;
         analysisResultElement.style.display = 'flex';
+        const diseaseInfoButton = document.getElementById('diseaseInfoButton');
+        diseaseInfoButton.style.display = 'block';
+
+        diseaseInfoButton.onclick = function() {
+        navigateToDiseaseInfo(data.disease);
+    };
         restartButton.style.display = 'block';
     }
 
